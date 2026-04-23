@@ -192,7 +192,7 @@ func (l *JsonStreamLogger) OnOpcode(pc uint64, typ byte, gas, cost uint64, scope
 		}
 		l.stream.WriteArrayEnd()
 	}
-	if !l.cfg.DisableMemory {
+	if l.cfg.EnableMemory {
 		memData := memory
 		l.stream.WriteMore()
 		l.stream.WriteObjectField("memory")
@@ -208,6 +208,11 @@ func (l *JsonStreamLogger) OnOpcode(pc uint64, typ byte, gas, cost uint64, scope
 			l.stream.WriteString(l.formatMemoryWord(memData[i:end]))
 		}
 		l.stream.WriteArrayEnd()
+	}
+	if l.cfg.EnableReturnData && len(rData) > 0 {
+		l.stream.WriteMore()
+		l.stream.WriteObjectField("returnData")
+		l.stream.WriteString(l.hexWithPrefix(rData))
 	}
 	if outputStorage {
 		l.stream.WriteMore()
